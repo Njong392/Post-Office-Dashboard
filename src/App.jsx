@@ -1,11 +1,10 @@
-
+import Login from './modules/auth/components/Login'
 
 function App() {
   
-
   return (
     <>
-      <p className="text-blue text-lg">Hello</p>
+      <Login />
     </>
   )
 }
