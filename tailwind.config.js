@@ -1,7 +1,13 @@
 import formsPlugin from '@tailwindcss/forms'
+import  flowBite from 'flowbite/plugin'
+
 /** @type {import('tailwindcss').Config} */
 export default {
-  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+    "node_modules/flowbite-react/lib/esm/**/*.js",
+  ],
   theme: {
     colors: {
       blue: "#0a5592",
@@ -12,8 +18,11 @@ export default {
       "light-green": "#99a64d",
       "lighter-green": "#aebe79",
     },
+    fontFamily: {
+      poppins: ["Poppins", "sans-serif"],
+    },
     extend: {},
   },
-  plugins: [formsPlugin],
+  plugins: [formsPlugin, flowBite],
 };
 
