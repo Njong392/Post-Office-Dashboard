@@ -25,24 +25,23 @@ const NotificationTable = () => {
 
   //function to calculate timeframes
   const getStartDate = (timeFrame) => {
-    const now = new Date();
-    const startDate = new Date();
+    let startDate = new Date();
 
     switch (timeFrame) {
-      case "week":
-        startDate.setDate(now.getDate() - 7);
+      case "thisMonth":
+        startDate = new Date(startDate.getFullYear(), startDate.getMonth, 1);
         break;
-      case "month":
-        startDate.setMonth(now.getMonth() - 1);
+      case "lastMonth":
+        startDate = new Date(startDate.getFullYear(), startDate.getMonth() - 1, 1);
         break;
-      case "year":
-        startDate.setFullYear(now.getFullYear() - 1);
+      case "lastYear":
+        startDate =  new Date(startDate.getFullYear() - 1, 0, 1);
         break;
       default:
-        break;
+        startDate = new Date(0); // Set to Unix epoch if no time frame is specified
     }
 
-    return startDate;
+    return Timestamp.fromDate(startDate); // Convert to Firestore Timestamp
   };
 
   useEffect(() => {
@@ -53,6 +52,7 @@ const NotificationTable = () => {
         const userId = currentUser.uid;
 
         const startDate = getStartDate(timeFrame);
+        //console.log(startDate)
         const q = query(
           packageCollectionRef,
           where("creatorId", "==", userId),
@@ -104,11 +104,37 @@ const NotificationTable = () => {
 
   return (
     <>
-      <FilterBar setTimeFrame={setTimeFrame} searchQuery={searchQuery} setSearchQuery={setSearchQuery}/>
+      <FilterBar
+        setTimeFrame={setTimeFrame}
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+      />
 
-      <div className="overflow-x-auto shadow-md sm:rounded-lg mt-6 border-2">
-        {statusCounts && <p>{statusCounts.resent}</p>}
-        <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+      <div className="overflow-x-auto mt-6 shadow-md">
+        <div className="grid grid-cols-3 gap-4">
+          <div className="border-2 rounded-lg p-2 bg-blue-700">
+            <p className="text-sm text-white font-bold">Collected</p>
+            {statusCounts && (
+              <p className="text-white">{statusCounts.collected}</p>
+            )}
+          </div>
+
+          <div className="border-2 rounded-lg p-2 bg-blue-700">
+            <p className="text-sm text-white font-bold">Not Collected</p>
+            {statusCounts && (
+              <p className="text-white">{statusCounts.NotCollected}</p>
+            )}
+          </div>
+
+          <div className="border-2 rounded-lg p-2 bg-blue-700">
+            <p className="text-sm text-white font-bold">Resent</p>
+            {statusCounts && (
+              <p className="text-white">{statusCounts.resent}</p>
+            )}
+          </div>
+        </div>
+
+        <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400 mt-4 ">
           <thead className="text-xs text-white uppercase bg-blue-700 dark:bg-gray-700 dark:text-gray-400">
             <tr>
               <th scope="col" className="px-6 py-3">
@@ -150,22 +176,31 @@ const NotificationTable = () => {
                   scope="row"
                   className="px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white"
                 >
-                  <Link
-                    to="/user"
-                    className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
-                  >
-                    {packages.recipientName}
-                  </Link>
+                  {packages.recipientid ? (
+                    <Link
+                      to="/user"
+                      className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
+                    >
+                      {packages.recipientName}
+                    </Link>
+                  ) : (
+                    <p
+                      to="/user"
+                      className="font-medium"
+                    >
+                      {packages.recipientName}
+                    </p>
+                  )}
                 </td>
                 <td className="px-6 py-4">{packages.countryOfOrigin}</td>
                 <td className="px-6 py-4">{packages.senderContact}</td>
                 <td className="px-6 py-4">
                   <select
                     className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-500 focus:border-primary-500 block w-20 p-2 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
-                    value={packages.status || "Not collected"}
+                    value={packages.status || "NotCollected"}
                     onChange={(e) => handleStatusChange(e, packages.id)}
                   >
-                    <option defaultValue="">Not collected</option>
+                    <option defaultValue="NotCollected">Not collected</option>
                     <option value="collected">Collected</option>
                     <option value="resent">Resent</option>
                   </select>

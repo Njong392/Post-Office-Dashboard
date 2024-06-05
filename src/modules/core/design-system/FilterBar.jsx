@@ -11,9 +11,9 @@ const FilterBar = ({setTimeFrame, searchQuery, setSearchQuery}) => {
             className="bg-gray-50 border border-gray-300 text-gray-900 text-sm focus:ring-primary-500 focus:border-primary-500 block w-25 p-2 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
             onChange={(e) => setTimeFrame(e.target.value)}
           >
-            <option value="month">This month</option>
-            <option value="week">This week</option>
-            <option value="year">This year</option>
+            <option value="thisMonth">This month</option>
+            <option value="lastMonth">Last Month</option>
+            <option value="lastYear">Last year</option>
           </select>
           <div className="relative w-full">
             <input
