@@ -178,14 +178,14 @@ const NotificationTable = () => {
                 >
                   {packages.recipientid ? (
                     <Link
-                      to="/user"
+                      to={`/user/${packages.recipientid}`}
                       className="font-medium text-blue-600 dark:text-blue-500 hover:underline"
                     >
                       {packages.recipientName}
                     </Link>
                   ) : (
                     <p
-                      to="/user"
+                      
                       className="font-medium"
                     >
                       {packages.recipientName}
