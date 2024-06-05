@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { auth, db } from "../../auth/config/firebase";
-import { Timestamp, addDoc, collection } from "firebase/firestore";
+import { Timestamp, addDoc, collection, getDocs, query, where } from "firebase/firestore";
 
 const NewPackageButton = () => {
   const [showModal, setShowModal] = useState(false);
@@ -11,8 +11,8 @@ const NewPackageButton = () => {
   const [collectionDate, setCollectionDate] = useState('');
   const [resendDate, setResendDate] = useState('');
   const [category, setCategory] = useState('');
-  const [recipientid] = useState(null);
-  const [status] = useState('not-collected')
+  //const [recipientid, setRecipientId] = useState(null);
+  const [status] = useState('NotCollected')
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState(false)
   const [collectedOrResentDate] = useState(null)
@@ -34,6 +34,8 @@ const NewPackageButton = () => {
   //toggle the modal
   const toggleModal = () => {
     setShowModal(!showModal);
+    setSuccess(false)
+    setError(false)
   };
 
   //add packages to package collection
@@ -43,8 +45,19 @@ const NewPackageButton = () => {
       if(auth.currentUser){
         const userId = currentUser.uid
 
+        //query the users collection
+        const q = query(collection(db, 'users'), where('name', '==', recipientName))
+
+        const querySnapshot = await getDocs(q)
+
+        let recipientId = null
+
+        if(!querySnapshot.empty){
+          recipientId = querySnapshot.docs[0].id
+        }
+
         await addDoc(packageCollectionRef, {
-          recipientid: recipientid,
+          recipientid: recipientId,
           countryOfOrigin: countryOfOrigin,
           senderContact: senderContact,
           recipientName: recipientName,
@@ -56,6 +69,14 @@ const NewPackageButton = () => {
           status: status,
           creatorId: userId,
         });
+        setCountryOfOrigin('')
+        setSenderContact('')
+        setRecipientName('')
+        setArrivalDate('')
+        setCollectionDate('')
+        setResendDate('')
+        setCategory('')
+        
       } else{
         console.log('user not logged in')
       }

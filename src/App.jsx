@@ -5,12 +5,36 @@ import Dashboard from './modules/core/components/Dashboard'
 import User from './modules/core/components/User'
 import NotificationCenter from './modules/core/components/NotificationCenter'
 import { useUserContext } from './modules/auth/hooks/useUserContext'
+import { getToken } from 'firebase/messaging'
+import { useEffect } from 'react'
+import { messaging } from './modules/auth/config/firebase'
 
 function App() {
   const {
     state: { user}
   } = useUserContext()
+  const {NOTIFS_APP_VAPID_KEY} = import.meta.env
+
+  async function requestPermission() {
+    //requesting permission using Notification API
+    const permission = await Notification.requestPermission();
+
+    if (permission === "granted") {
+      const token = await getToken(messaging, {
+        vapidKey: NOTIFS_APP_VAPID_KEY,
+      });
+
+      //We can send token to server
+      console.log("Token generated : ", token);
+    } else if (permission === "denied") {
+      //notifications are blocked
+      alert("You denied permissions for the notification");
+    }
+  }
   
+  useEffect(() => {
+    requestPermission();
+  }, []);
   
 
   console.log('user', user)
