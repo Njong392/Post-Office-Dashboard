@@ -13,6 +13,7 @@ import {
 import { useState, useEffect } from "react";
 import { formatDate } from "../utils/dateUtil";
 import FilterBar from "./FilterBar";
+import { compareDesc } from 'date-fns'
 
 const NotificationTable = () => {
   const [packageList, setPackageList] = useState([]);
@@ -45,6 +46,8 @@ const NotificationTable = () => {
   };
 
   useEffect(() => {
+    
+
     const unsubscribeAuth = auth.onAuthStateChanged((user) => {
       setCurrentUser(user);
 
@@ -56,19 +59,52 @@ const NotificationTable = () => {
         const q = query(
           packageCollectionRef,
           where("creatorId", "==", userId),
-          orderBy("collectedOrResentDate", "asc")
+          orderBy("serialNumber", "asc")
         );
 
         //get all packages from collection irt
         const unsubscribeQuery = onSnapshot(q, (snapshot) => {
           try {
-            const packages = snapshot.docs.map((doc) => ({
+            let packages = snapshot.docs.map((doc) => ({
               ...doc.data(),
               id: doc.id,
             }));
+
+            // add isOverdue property to each package
+            packages = packages.map(pkg => ({
+              ...pkg,
+              isCollectionOverdue: !pkg.collectedOrResentDate && new Date(pkg.DueCollectionDate.toDate()) < new Date(), 
+              isResendOverdue: !pkg.collectedOrResentDate && new Date(pkg.DueResendDate.toDate()) < new Date()
+            })) 
+
+            // sort packages by isOverDue and collectedOrResentDate
+           packages.sort((a, b) => {
+             if (
+               (a.isCollectionOverdue || a.isResendOverdue) &&
+               !(b.isCollectionOverdue || b.isResendOverdue)
+             )
+               return -1;
+             if (
+               !(a.isCollectionOverdue || a.isResendOverdue) &&
+               (b.isCollectionOverdue || b.isResendOverdue)
+             )
+               return 1;
+               if (
+                 !(a.isCollectionOverdue || a.isResendOverdue) &&
+                 !(b.isCollectionOverdue || b.isResendOverdue)
+               )
+                 return a.serialNumber - b.serialNumber;
+             return compareDesc(
+               new Date(a.collectedOrResentDate),
+               new Date(b.collectedOrResentDate)
+             );
+           });
+
             const statusCounts = packages.reduce((counts, pkg) => {
               if (pkg.collectedOrResentDate >= startDate) {
                 counts[pkg.status] = (counts[pkg.status] || 0) + 1;
+              } else{
+                counts['NotCollected'] = (counts['NotCollected'] || 0) + 1
               }
               return counts;
             }, {});
@@ -138,6 +174,9 @@ const NotificationTable = () => {
           <thead className="text-xs text-white uppercase bg-blue-700 dark:bg-gray-700 dark:text-gray-400">
             <tr>
               <th scope="col" className="px-6 py-3">
+                S/N
+              </th>
+              <th scope="col" className="px-6 py-3">
                 Recipient Name
               </th>
               <th scope="col" className="px-6 py-3">
@@ -172,6 +211,7 @@ const NotificationTable = () => {
                 className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
                 key={packages.id}
               >
+                <td className="px-6 py-4">{packages.serialNumber}</td>
                 <td
                   scope="row"
                   className="px-6 py-4 text-gray-900 whitespace-nowrap dark:text-white"
@@ -184,12 +224,7 @@ const NotificationTable = () => {
                       {packages.recipientName}
                     </Link>
                   ) : (
-                    <p
-                      
-                      className="font-medium"
-                    >
-                      {packages.recipientName}
-                    </p>
+                    <p className="font-medium">{packages.recipientName}</p>
                   )}
                 </td>
                 <td className="px-6 py-4">{packages.countryOfOrigin}</td>
@@ -211,10 +246,16 @@ const NotificationTable = () => {
                 </td>
 
                 <td className="px-6 py-4">
+                  {packages.isCollectionOverdue && (
+                    <span className="text-red-500 text-2xl">&#8226;</span>
+                  )}
                   {formatDate(packages.DueCollectionDate.toDate())}
                 </td>
 
                 <td className="px-6 py-4">
+                  {packages.isResendOverdue && (
+                    <span className="text-red-500 text-2xl">&#8226;</span>
+                  )}
                   {formatDate(packages.DueResendDate.toDate())}
                 </td>
 

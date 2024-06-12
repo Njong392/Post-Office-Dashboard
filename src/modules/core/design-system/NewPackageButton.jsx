@@ -17,6 +17,7 @@ const NewPackageButton = () => {
   const [error, setError] = useState(false)
   const [collectedOrResentDate] = useState(null)
   const [currentUser, setCurrentUser] = useState(null)
+  const [serialNumber, setSerialNumber] = useState(null)
  
 
   const packageCollectionRef = collection(db, 'packages')
@@ -59,6 +60,7 @@ const NewPackageButton = () => {
         await addDoc(packageCollectionRef, {
           recipientid: recipientId,
           countryOfOrigin: countryOfOrigin,
+          serialNumber: serialNumber,
           senderContact: senderContact,
           recipientName: recipientName,
           arrivalDate: Timestamp.fromDate(new Date(arrivalDate)),
@@ -68,6 +70,7 @@ const NewPackageButton = () => {
           category: category,
           status: status,
           creatorId: userId,
+          
         });
         setCountryOfOrigin('')
         setSenderContact('')
@@ -76,6 +79,7 @@ const NewPackageButton = () => {
         setCollectionDate('')
         setResendDate('')
         setCategory('')
+        setSerialNumber('')
         
       } else{
         console.log('user not logged in')
@@ -112,7 +116,7 @@ const NewPackageButton = () => {
         >
           <div className="relative p-4 w-full max-w-md max-h-full">
             <div className="relative bg-white rounded-lg shadow dark:bg-gray-700">
-              <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t dark:border-gray-600">
+              <div className="flex items-center justify-between p-4 md:p-2 border-b rounded-t dark:border-gray-600">
                 <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                   Add New Package
                 </h3>
@@ -143,6 +147,25 @@ const NewPackageButton = () => {
 
               <form className="p-4 md:p-5">
                 <div className="grid gap-4 mb-4 grid-cols-2">
+                  <div className="col-span-2">
+                    <label
+                      htmlFor="cor"
+                      className="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
+                    >
+                      Package Serial Number
+                    </label>
+                    <input
+                      type="text"
+                      name="cor"
+                      id="cor"
+                      className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5 dark:bg-gray-600 dark:border-gray-500 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
+                      placeholder="Package Serial Number"
+                      required=""
+                      value={serialNumber}
+                      onChange={(e) => setSerialNumber(e.target.value)}
+                    />
+                  </div>
+
                   <div className="col-span-2">
                     <label
                       htmlFor="cor"
@@ -280,7 +303,9 @@ const NewPackageButton = () => {
                   <p className="text-green-500">Package added successfully</p>
                 )}
                 {error && (
-                  <p className="text-red-500">Oops, some error occurred. Try again</p>
+                  <p className="text-red-500">
+                    Oops, some error occurred. Try again
+                  </p>
                 )}
                 <button
                   type="submit"
