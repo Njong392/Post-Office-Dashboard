@@ -27,8 +27,7 @@ const Signup = () => {
         </h1>
 
         <p className="mx-auto mt-4 max-w-md text-center text-deep-gray">
-          Lorem ipsum dolor sit amet, consectetur adipisicing elit. Obcaecati
-          sunt dolores deleniti inventore quaerat mollitia?
+          New here? Sign up to start using the dashboard.
         </p>
 
         <form

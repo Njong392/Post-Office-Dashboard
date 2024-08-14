@@ -20,8 +20,7 @@ const Login = () => {
     <h1 className="text-center text-2xl font-bold text-blue-700 sm:text-3xl">Welcome back, login</h1>
 
     <p className="mx-auto mt-4 max-w-md text-center text-deep-gray">
-      Lorem ipsum dolor sit amet, consectetur adipisicing elit. Obcaecati sunt dolores deleniti
-      inventore quaerat mollitia?
+      Welcome back to your post office dashboard!
     </p>
 
     <form action="#" className="mb-0 mt-6 space-y-4 rounded-lg p-4 shadow-lg sm:p-6 lg:p-8" onSubmit={handleSubmit}>
