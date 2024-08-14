@@ -57,6 +57,8 @@ const NewPackageButton = () => {
           recipientId = querySnapshot.docs[0].id
         }
 
+        console.log(recipientId)
+
         await addDoc(packageCollectionRef, {
           recipientid: recipientId,
           countryOfOrigin: countryOfOrigin,
