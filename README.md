@@ -1,5 +1,5 @@
 # 🦄 Post Office System Dashboard
-This website serves as the dashboard for a post office management system, and specifically for package management. From the dashboard, the admin can see all packages registered to users who have the mobile application installed, and they are able to also register information about all incoming packages. 
+This website serves as the dashboard for a post office management system, and specifically for package management. From the dashboard, the admin can see all packages registered to users who have the [mobile application installed](https://github.com/Njong392/post_notifs) installed, and they are able to also register information about all incoming packages. 
 
 # ⚒️ How does it work?
 
